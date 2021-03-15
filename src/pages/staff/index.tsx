@@ -1,15 +1,72 @@
-import React, { FC, PureComponent } from 'react';
+import React, { FC, useState, PureComponent } from 'react';
 import { IStaffModelState, Dispatch, connect, Loading } from 'umi';
-import { Button } from "antd";
+import { Popconfirm, Button } from "antd";
 import Protable from '@ant-design/pro-table';
 import type { ProColumnType } from '@ant-design/pro-table';
 import { ISingleStaffInfo } from './model';
+import { FormValues } from "./service";
+import StaffInfoModal from './components/StaffInfoModal';
 interface PageProps {
   staff: IStaffModelState;
   loading: boolean;
   dispatch: Dispatch;
 };
-const columns: ProColumnType<ISingleStaffInfo>[] = [
+
+  
+const AccountListPage: FC<PageProps> = ( { staff, loading, dispatch } ) => {
+  const { data, meta } = staff; 
+  const [ staffInfoModalVisible, setStaffInfoModalVisible ] = useState(false);
+  const [ staffInfo, setStaffInfo ] = useState<ISingleStaffInfo  | undefined >(undefined);
+
+  const deleteStaffById = ( id: number ) => {
+    dispatch({
+      type: 'staff/delStaffById',
+      payload: { id }
+    });
+  };
+
+  const editStaffHandler = ( currentStaffInfo: ISingleStaffInfo ) => {
+    setStaffInfo(currentStaffInfo);
+    setStaffInfoModalVisible(true);
+  };
+
+  const modalCancelHandler = () => {
+    setStaffInfo(undefined);
+    setStaffInfoModalVisible(false);
+  };
+  const editStaffWithNewInfo = ( currentStaffInfo: FormValues ) => {
+    // debugger;
+    // const { id, ...staffInfo } = currentStaffInfo;
+    dispatch({
+      type: 'staff/editStaff',
+      payload: { currentStaffInfo }
+    })
+  };
+
+  const createStaffWithNewInfo = ( currentStaffInfo: FormValues ) => {
+    currentStaffInfo.status = 1;
+    currentStaffInfo.create_time='2021-03-14T12:18:27Z';
+    console.log('in onFinish', currentStaffInfo);
+    dispatch({
+      type: 'staff/createStaff',
+      payload: { currentStaffInfo }
+    })
+  };
+
+  const onFinish = (currentStaffInfo: FormValues) => {
+    // debugger;
+    const { id, ...staffInfo } = currentStaffInfo;
+    if(id){
+      editStaffWithNewInfo(currentStaffInfo);
+    } else {
+      createStaffWithNewInfo(currentStaffInfo);
+    }
+  };
+  const createStaffHandler = () => {
+    setStaffInfoModalVisible(true);
+  };
+
+  const columns: ProColumnType<ISingleStaffInfo>[] = [
     {
         title: 'ID',
         dataIndex: 'id',
@@ -33,24 +90,41 @@ const columns: ProColumnType<ISingleStaffInfo>[] = [
       valueType: 'text',
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'action',
       sorter: true,
       valueType: 'option',
-      render: () => [
-        <a key="delete">Delete</a>,
-        <a key="link" className="ant-dropdown-link">
-          More actions
-        </a>,
+      render: (text, record) => [
+        <Popconfirm 
+          title='确定删除该元素吗？' 
+          onConfirm={() => deleteStaffById(record.id)} 
+            okText='确定' 
+            cancelText='取消'>
+              <a key="delete">删除</a>
+        </Popconfirm>,
+        <a key="edit" onClick={() => editStaffHandler(record)} className="ant-dropdown-link">
+          编辑
+        </a>
       ],
     },
   ];
-  
-const AccountListPage: FC<PageProps> = ( { staff, loading, dispatch } ) => {
-  const { data, meta } = staff; 
   return(
-      <div>
-          <Protable columns={columns} dataSource={data} />
+      <div>          
+          <Protable 
+            columns={columns} 
+            dataSource={data} 
+            loading={loading} 
+            toolbar={{
+              actions: [
+                <Button type='primary' onClick={() => createStaffHandler()}>创建新员工</Button>
+              ]
+            }}/>
+          <StaffInfoModal 
+            visible={staffInfoModalVisible} 
+            record={staffInfo} 
+            onCancel={modalCancelHandler} 
+            onFinish={onFinish}
+          />
       </div>
   )
 };

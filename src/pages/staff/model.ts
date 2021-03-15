@@ -1,5 +1,5 @@
 import { Reducer, Effect, Subscription } from "umi";
-import { getRemoteStaffList } from './service';
+import { getRemoteStaffList, deleteStaffByStaffId, createStaff, editStaff } from './service';
 export interface ISingleStaffInfo {
     id: number;
     name: string;
@@ -26,6 +26,8 @@ interface IStaffModel {
     effects: {
         fetchRemoteStaffList: Effect;
         delStaffById: Effect;
+        createStaff: Effect;
+        editStaff: Effect;
     };
     subscriptions: {
         setup: Subscription;
@@ -52,10 +54,10 @@ const StaffModel: IStaffModel = {
         }
     },
     effects: {
-        // 根据payload，去call service时带参数, 再put reducer。修改store中state
-        *fetchRemoteStaffList( action, { call, put }){
+        // 根据页面/其他effect/subscription，传递的payload，去call service时带参数, 再put reducer。修改store中state
+        *fetchRemoteStaffList( action, { call, put } ) {
             const { page, per_page } = action.payload;
-            const result = yield call( getRemoteStaffList, {page, per_page} );
+            const result = yield call( getRemoteStaffList, { page, per_page } );
             // debugger;
             if (result) {
                 yield put({
@@ -64,8 +66,56 @@ const StaffModel: IStaffModel = {
                 })
             }
         },
-        *delStaffById(){
-            return null;
+        *delStaffById( action, { call, select, put } ) {
+            const { id } = action.payload;
+            const result = yield call( deleteStaffByStaffId, { id } );
+            if(result) {
+                const { page, per_page } = yield select(
+                    (state: any) => state.staff.meta
+                );
+                yield put({
+                    type: 'fetchRemoteStaffList',
+                    payload: {
+                        page,
+                        per_page
+                    }
+                })
+            }
+        },
+        *createStaff( action, { call, put, select }) {
+            const { currentStaffInfo } = action.payload;
+            const result = yield call( createStaff, currentStaffInfo);
+            const { page, per_page } = yield select(
+                (state: any) => state.staff.meta
+            );
+            if(result){
+                yield put({
+                    type: 'fetchRemoteStaffList',
+                    payload: {
+                        page,
+                        per_page
+                    }
+                })
+            }
+        },
+        *editStaff( action, { call, put, select }) {            
+            const { currentStaffInfo } = action.payload;
+            // const { id, ...staffInfo } = currentStaffInfo;
+            // console.log('in model', id, staffInfo);            
+            // debugger;
+            const result = yield call( editStaff,  currentStaffInfo);
+            const { page, per_page } = yield select(
+                (state: any) => state.staff.meta
+            );
+            if(result){
+                yield put({
+                    type: 'fetchRemoteStaffList',
+                    payload: {
+                        page,
+                        per_page
+                    }
+                })
+            }
         }
     },
     // 监听到访问路径是staff时，触发fetchRemoteStaffList
