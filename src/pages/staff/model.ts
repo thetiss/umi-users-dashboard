@@ -1,5 +1,5 @@
-import { Reducer, Effect } from "umi";
-
+import { Reducer, Effect, Subscription } from "umi";
+import { getRemoteStaffList } from './service';
 export interface ISingleStaffInfo {
     id: number;
     name: string;
@@ -9,16 +9,17 @@ export interface ISingleStaffInfo {
     status: number;
 };
 
+export interface IStaffModelState {
+    data: ISingleStaffInfo[];
+    meta: {
+        total: number;
+        page: number;
+        per_page: number;    
+    }
+};
 interface IStaffModel {
     namespace: 'staff';
-    state: {
-        data: ISingleStaffInfo[];
-        meta: {
-            total: 0;
-            currentPage: 1;
-            pageSize: 5;
-        };
-    };
+    state: IStaffModelState;
     reducers: {
         getStaffList: Reducer;
     };
@@ -26,29 +27,61 @@ interface IStaffModel {
         fetchRemoteStaffList: Effect;
         delStaffById: Effect;
     };
-    //subscription: Subscription;
-}
+    subscriptions: {
+        setup: Subscription;
+    };
+};
 const StaffModel: IStaffModel = {
     namespace: 'staff',
     state: {
         data: [],
         meta: {
             total: 0,
-            currentPage: 1,
-            pageSize: 5
+            page: 1,
+            per_page: 5
         }
     },
     reducers: {
-        getStaffList() {
-            return null;
+        getStaffList(state, action) {
+            const { data, meta } = action.payload;
+            return {
+                ...state,
+                data,
+                meta
+            };
         }
     },
     effects: {
-        fetchRemoteStaffList(){
-            return null;
+        // 根据payload，去call service时带参数, 再put reducer。修改store中state
+        *fetchRemoteStaffList( action, { call, put }){
+            const { page, per_page } = action.payload;
+            const result = yield call( getRemoteStaffList, {page, per_page} );
+            // debugger;
+            if (result) {
+                yield put({
+                    type: 'getStaffList',
+                    payload: result
+                })
+            }
         },
-        delStaffById(){
+        *delStaffById(){
             return null;
+        }
+    },
+    // 监听到访问路径是staff时，触发fetchRemoteStaffList
+    subscriptions: { 
+        setup({ dispatch, history }){
+            history.listen(( { pathname } ) => {
+                if(pathname === '/staff') {
+                    dispatch({
+                        type: 'fetchRemoteStaffList',
+                        payload: {
+                            page: 1,
+                            per_page: 10
+                        }
+                    })
+                }
+            })
         }
     }
 
