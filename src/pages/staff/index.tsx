@@ -1,10 +1,14 @@
-import React, { PureComponent } from 'react';
-import { IStaffModelState, Dispatch, connect } from 'umi';
+import React, { FC, PureComponent } from 'react';
+import { IStaffModelState, Dispatch, connect, Loading } from 'umi';
 import { Button } from "antd";
 import Protable from '@ant-design/pro-table';
 import type { ProColumnType } from '@ant-design/pro-table';
 import { ISingleStaffInfo } from './model';
-
+interface PageProps {
+  staff: IStaffModelState;
+  loading: boolean;
+  dispatch: Dispatch;
+};
 const columns: ProColumnType<ISingleStaffInfo>[] = [
     {
         title: 'ID',
@@ -42,20 +46,15 @@ const columns: ProColumnType<ISingleStaffInfo>[] = [
     },
   ];
   
-const AccountListPage = ( staff: any ) => {
-  console.log('what is staff', staff,staff.staff.staff);
-  const { data, meta } = staff.staff.staff; 
-  // debugger;
+const AccountListPage: FC<PageProps> = ( { staff, loading, dispatch } ) => {
+  const { data, meta } = staff; 
   return(
       <div>
           <Protable columns={columns} dataSource={data} />
-          Protable is coming……
       </div>
   )
 };
-const mapStateToProps = ( staff: IStaffModelState ) => {
-  return {
-    staff
-  }
-};
-export default connect(mapStateToProps)(AccountListPage);
+export default connect(({ staff, loading }: { staff: IStaffModelState, loading: Loading }) => ({
+  staff,
+  loading: loading.models.staff
+}))(AccountListPage);
