@@ -11,7 +11,6 @@ interface PageProps {
   loading: boolean;
   dispatch: Dispatch;
 };
-
   
 const AccountListPage: FC<PageProps> = ( { staff, loading, dispatch } ) => {
   const { data, meta } = staff; 
@@ -35,8 +34,6 @@ const AccountListPage: FC<PageProps> = ( { staff, loading, dispatch } ) => {
     setStaffInfoModalVisible(false);
   };
   const editStaffWithNewInfo = ( currentStaffInfo: FormValues ) => {
-    // debugger;
-    // const { id, ...staffInfo } = currentStaffInfo;
     dispatch({
       type: 'staff/editStaff',
       payload: { currentStaffInfo }
@@ -54,7 +51,6 @@ const AccountListPage: FC<PageProps> = ( { staff, loading, dispatch } ) => {
   };
 
   const onFinish = (currentStaffInfo: FormValues) => {
-    // debugger;
     const { id, ...staffInfo } = currentStaffInfo;
     if(id){
       editStaffWithNewInfo(currentStaffInfo);
@@ -62,6 +58,7 @@ const AccountListPage: FC<PageProps> = ( { staff, loading, dispatch } ) => {
       createStaffWithNewInfo(currentStaffInfo);
     }
   };
+  
   const createStaffHandler = () => {
     setStaffInfoModalVisible(true);
   };
