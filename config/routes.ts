@@ -5,7 +5,8 @@ export default [
         component: '@/pages/index',
         wrappers: ['@/wrappers/auth'],
         routes: [
-            { path: '/staff', component: '@/pages/staff' }
+            { path: '/staff', component: '@/pages/staff' },
+            { path: '/products', component: '@/pages/products' }
         ]
     }
 ]
