@@ -1,9 +1,5 @@
 import styles from './index.less';
-
-export default function IndexPage() {
-  return (
-    <div>
-      <h1 className={styles.title}>Page index</h1>
-    </div>
-  );
+import Staff from './staff';
+export default function IndexPage(props: any) {
+  return <div style={{ padding: 20 }}>{ props.children }</div>;
 }

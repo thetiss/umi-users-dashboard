@@ -15,9 +15,11 @@ export const deleteStaffByStaffId = async ({ id }: { id: number }) => {
         skipErrorHandler: false
     })
     .then(function(response){
+        console.log('in service work', response);        
         return true
     })
     .catch(function(error){
+        console.log('in service fail', error);        
         return false
     })
 };

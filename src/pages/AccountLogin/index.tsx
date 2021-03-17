@@ -1,16 +1,29 @@
 import React, { FC, useState } from 'react';
-import { message } from 'antd';
+import { Dispatch, connect, Loading } from 'umi';
+import { message, Form, Button, Input } from 'antd';
 import ProForm, { ProFormText, ProFormSwitch } from '@ant-design/pro-form';
 import { UserOutlined, EyeInvisibleOutlined, EyeTwoTone, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { accountLoginWithParams, accountLogin, FormValues } from "./service";
+import { accountLoginWithParams, FormValues } from "./service";
 import PageTitle from "./components/PageTitle";
 
-const loginHandler = async ( loginInfo: FormValues ) => {
-    const response = await accountLoginWithParams(loginInfo);
-    response ? message.error('Fail to Login'): message.info('Success Login')
+
+// const loginHandler = async ( loginInfo: FormValues ) => {
+//     const response = await accountLoginWithParams(loginInfo);
+//     response ? message.info('Success Login') : message.error('Fail to Login')
+// };
+interface PageProps {
+    dispatch: Dispatch;
+
 };
 
-const AccountLogin = () => {
+const AccountLogin: FC<PageProps> = ( { dispatch }) => {
+    const loginHandler = async ( loginAccountInfo: FormValues ) => {
+        dispatch({
+            type: 'login/login',
+            payload: { loginAccountInfo }
+        });
+        // debugger;
+    };
     return(
         <div
             style={{
@@ -20,7 +33,6 @@ const AccountLogin = () => {
         >
             <ProForm 
                 onFinish={(values) => loginHandler(values)}
-
             >
                 <PageTitle />
                 <ProFormText
@@ -62,5 +74,11 @@ const AccountLogin = () => {
         </div>
     )
 };
-export default AccountLogin;
+// export default connect( ({ dispatch, loading }:{ dispatch: Dispatch, loading: Loading }) => ({ 
+//     dispatch, 
+//     loading: loading.models.login 
+// }))(AccountLogin);
 
+export default connect( ({ dispatch }:{ dispatch: Dispatch }) => ({ 
+    dispatch
+}))(AccountLogin);
