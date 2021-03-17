@@ -1,8 +1,13 @@
 import { request } from 'umi';
+import { parse } from 'querystring';
 
 export interface FormValues {
     [name: string]: any;
 };
+export const getPageQuery = () => parse(window.location.href.split('?')[1]);
+let testUrl = window.location.href;
+let rightUrl = window.location.href.split('?')[1];
+// debugger;
 
 export const accountLoginWithParams = async ( loginInputInfo: FormValues ) => {
     const { isAdmin, ...restInfo } = loginInputInfo;

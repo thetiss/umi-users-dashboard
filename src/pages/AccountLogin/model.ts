@@ -1,6 +1,6 @@
-import { Reducer, Effect, Subscription } from "umi";
+import { Reducer, Effect, Subscription, history } from "umi";
 import { message } from 'antd';
-import { accountLoginWithParams } from './service';
+import { accountLoginWithParams, getPageQuery } from './service';
 
 export interface ILoginModelState {
     data: number;
@@ -26,6 +26,13 @@ const LoginModel: ILoginModel= {
     reducers: {
         changeLoginStatus( state, action ) {
             const { result } = action.payload;
+            const isLogin = localStorage.getItem('userInfo') !== null;
+            let accessUrl = localStorage.getItem('redirectUrl') ;
+            if(!accessUrl){
+                accessUrl = '/';
+            }
+            history.replace(accessUrl);
+            // debugger;
             return {
                 ...state,
                 result
@@ -35,14 +42,17 @@ const LoginModel: ILoginModel= {
     effects: {
         *login( action, { call, put } ) {
             const { loginAccountInfo } = action.payload;
+            const urlParams = new URL(window.location.href);
+            const params = JSON.stringify(getPageQuery());     
+            // history.goBack();
+            // debugger;
             const result = yield call(accountLoginWithParams, loginAccountInfo);
             result ? message.info('Success Login') : message.error('Fail to Login');
-            // const loginStatus = localStorage.getItem('userInfo') !== null;          
-            // debugger;
+
             if(result){
                 yield put({
                     type: 'changeLoginStatus',
-                    payload: result
+                    payload: {result}
                 });
             }
         },
