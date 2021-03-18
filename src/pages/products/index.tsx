@@ -53,11 +53,11 @@ const editProductHandler = ( record: IProductInfo ) => {
 
 };
 
-const getProductsListHandler = async () => {
-    const response = await getRemoteProductsList();
+const getProductsListHandler = async ( currentPage: number | undefined ) => {
+    const response = await getRemoteProductsList(currentPage);
     return {
       data: response.list,
-      total: response.size,
+      total: response.total,
       success: true
     }
 };
@@ -68,7 +68,7 @@ const ProductsList = () => {
         <div>
             <Protable
                 columns={columns} 
-                request = {() => getProductsListHandler()}
+                request = {(params) => getProductsListHandler(params.current)}
             />
         </div>
     )

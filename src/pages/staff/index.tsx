@@ -65,16 +65,22 @@ const AccountListPage: FC<PageProps> = ( { staff, loading, dispatch } ) => {
 
   const columns: ProColumnType<ISingleStaffInfo>[] = [
     {
-        title: 'ID',
-        dataIndex: 'id',
+      title: '序号',
+      dataIndex: 'id',
+      valueType: 'indexBorder',
+      width: 72
     },
     {
-        title: 'Name',
-        dataIndex: 'name',
+      title: 'ID',
+      dataIndex: 'id',
     },
     {
-        title: '邮箱',
-        dataIndex: 'email',
+      title: 'Name',
+      dataIndex: 'name',
+    },
+    {
+      title: '邮箱',
+      dataIndex: 'email',
     },    
     {
       title: '创建时间',

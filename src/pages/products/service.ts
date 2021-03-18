@@ -10,11 +10,11 @@ export interface IProductInfo {
     status: number;
     imageHost: string;
 };
+
 // http://adminv2.happymmall.com/manage/product/list.do?pageNum=1
-// export const getRemoteProductsList = async ( pageNum: number) => {
-export const getRemoteProductsList = async ( ) => {
-    let pageNum = 1;
-    return request(`use/manage/product/list.do?pageNum=${pageNum}`, {
+
+export const getRemoteProductsList = async ( currentPage: number | undefined ) => {
+    return request(`use/manage/product/list.do?pageNum=${currentPage}`, {
         method: 'get',
         skipErrorHandler: false
     })
