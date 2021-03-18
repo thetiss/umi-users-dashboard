@@ -42,7 +42,6 @@ export const createStaff = async (value: FormValues) => {
 export const editStaff = async (value: FormValues) => {
     // export const editStaff = async ({id, value}: {id: number, value: FormValues }) => {
     const { id, ...restValue } = value;
-    // console.log('in service', value, id, restValue);    
     return request(`/save/users/${id}`,{
         method: 'PUT',
         data: restValue,

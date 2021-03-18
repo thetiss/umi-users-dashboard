@@ -18,28 +18,8 @@ export const getRemoteProductsList = async ( ) => {
         method: 'get',
         skipErrorHandler: false
     })
-    .then(function(info){
-        
-        return info.data.list;
-    })
-    .catch(function(error){
-        return false
-    })
-};
-
-export const getRemoteProductsListTS = async ( ) => {
-    let pageNum = 1;
-    return request(`use/manage/product/list.do?pageNum=${pageNum}`, {
-        method: 'get',
-        skipErrorHandler: false
-    })
-    .then(function(info){
-        // debugger;
-        //return info.data.list;
-        return {
-            success: true,
-            data: info.data.list
-        }
+    .then(function(info){        
+        return info.data;
     })
     .catch(function(error){
         return false
